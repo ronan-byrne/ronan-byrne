@@ -1,10 +1,424 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Retro Games</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Retro Arcade - Classic Mini Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --retro-bg: #0a0a0f;
+            --retro-primary: #1a1a2e;
+            --retro-secondary: #16213e;
+            --retro-accent: #0f3460;
+            --retro-highlight: #e94560;
+            --retro-success: #27ae60;
+            --retro-text: #f5f5f5;
+            --retro-text-dim: #bdc3c7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: linear-gradient(135deg, var(--retro-bg) 0%, var(--retro-primary) 50%, var(--retro-secondary) 100%);
+            color: var(--retro-text);
+            min-height: 100vh;
+            line-height: 1.6;
+            background-attachment: fixed;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .retro-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .glow-text {
+            font-size: 2.5rem;
+            text-shadow: 
+                0 0 5px var(--retro-highlight),
+                0 0 10px var(--retro-highlight),
+                0 0 15px var(--retro-highlight),
+                0 0 20px var(--retro-highlight);
+            animation: glow-pulse 2s ease-in-out infinite alternate;
+            margin-bottom: 20px;
+        }
+
+        @keyframes glow-pulse {
+            from { 
+                text-shadow: 
+                    0 0 5px var(--retro-highlight), 
+                    0 0 10px var(--retro-highlight), 
+                    0 0 15px var(--retro-highlight); 
+            }
+            to { 
+                text-shadow: 
+                    0 0 10px var(--retro-highlight), 
+                    0 0 20px var(--retro-highlight), 
+                    0 0 30px var(--retro-highlight); 
+            }
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--retro-text-dim);
+            letter-spacing: 2px;
+            animation: fade-in-up 1s ease-out 0.5s both;
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: var(--retro-secondary);
+            border: 3px solid var(--retro-accent);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: slide-in 0.6s ease-out;
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-card:nth-child(3) { animation-delay: 0.4s; }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--retro-highlight), var(--retro-accent), var(--retro-highlight));
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover:not(.coming-soon) {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(233, 69, 96, 0.4);
+        }
+
+        .game-card:hover:not(.coming-soon)::before {
+            opacity: 1;
+        }
+
+        .game-card.coming-soon {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .game-card h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--retro-highlight);
+        }
+
+        .game-card p {
+            font-size: 0.6rem;
+            color: var(--retro-text-dim);
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .retro-button {
+            background: linear-gradient(45deg, var(--retro-accent), var(--retro-highlight));
+            border: 2px solid var(--retro-highlight);
+            color: var(--retro-text);
+            padding: 12px 24px;
+            font-family: inherit;
+            font-size: 0.7rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .retro-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .retro-button:hover:not(.disabled) {
+            background: var(--retro-highlight);
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.6);
+            transform: scale(1.05);
+        }
+
+        .retro-button:hover:not(.disabled)::before {
+            left: 100%;
+        }
+
+        .retro-button.disabled {
+            background: #555;
+            border-color: #777;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .retro-footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 2px solid var(--retro-accent);
+            margin-top: 40px;
+            animation: fade-in 1s ease-out 1s both;
+        }
+
+        .retro-footer p {
+            font-size: 0.6rem;
+            color: var(--retro-text-dim);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--retro-highlight);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .glow-text {
+                font-size: 1.8rem;
+            }
+            
+            .game-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .glow-text {
+                font-size: 1.4rem;
+            }
+            
+            .subtitle {
+                font-size: 0.6rem;
+            }
+            
+            .game-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>My retro games site is coming soon!</p>
+    <!-- Animated starfield background -->
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <header class="retro-header">
+            <h1 class="glow-text">🎮 RETRO ARCADE 🎮</h1>
+            <p class="subtitle">Classic Flash-Style Mini Games</p>
+        </header>
+
+        <main class="game-grid">
+            <div class="game-card">
+                <div class="game-icon">🏹</div>
+                <h3>Archery Challenge</h3>
+                <p>Test your aim and precision! Pull back the bow and hit the bullseye in this classic target shooting game.</p>
+                <button class="retro-button" onclick="alert('Archery game coming soon! 🏹')">PLAY NOW</button>
+            </div>
+
+            <div class="game-card coming-soon">
+                <div class="coming-soon-badge">SOON</div>
+                <div class="game-icon">🎱</div>
+                <h3>Pool Master</h3>
+                <p>Rack 'em up! Classic 8-ball pool with realistic physics and smooth gameplay.</p>
+                <button class="retro-button disabled">COMING SOON</button>
+            </div>
+
+            <div class="game-card coming-soon">
+                <div class="coming-soon-badge">SOON</div>
+                <div class="game-icon">⚽</div>
+                <h3>Penalty Kick</h3>
+                <p>Beat the keeper! Choose your angle and power to score the perfect penalty kick.</p>
+                <button class="retro-button disabled">COMING SOON</button>
+            </div>
+
+            <div class="game-card coming-soon">
+                <div class="coming-soon-badge">SOON</div>
+                <div class="game-icon">🌟</div>
+                <h3>Bubble Shooter</h3>
+                <p>Pop colorful bubbles in this addictive match-3 puzzle game with satisfying physics.</p>
+                <button class="retro-button disabled">COMING SOON</button>
+            </div>
+
+            <div class="game-card coming-soon">
+                <div class="coming-soon-badge">SOON</div>
+                <div class="game-icon">⛳</div>
+                <h3>Mini Golf</h3>
+                <p>Putt your way through challenging courses with obstacles and tricky angles.</p>
+                <button class="retro-button disabled">COMING SOON</button>
+            </div>
+        </main>
+
+        <footer class="retro-footer">
+            <p>Made with ❤️ and pure nostalgia • Ronan's Retro Arcade</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create animated starfield
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 50;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Random position
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Random size
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                // Random animation delay
+                star.style.animationDelay = Math.random() * 3 + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Add interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            console.log('🎮 Retro Arcade Loaded!');
+            
+            // Add hover effects for game cards
+            const gameCards = document.querySelectorAll('.game-card:not(.coming-soon)');
+            
+            gameCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click effects for buttons
+            const buttons = document.querySelectorAll('.retro-button:not(.disabled)');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1.05)';
+                    }, 100);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
