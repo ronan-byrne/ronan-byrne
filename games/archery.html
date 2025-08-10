@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏹 Archery Challenge - Retro Arcade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --retro-bg: #0a0a0f;
+            --retro-primary: #1a1a2e;
+            --retro-secondary: #16213e;
+            --retro-accent: #0f3460;
+            --retro-highlight: #e94560;
+            --retro-success: #27ae60;
+            --retro-warning: #f39c12;
+            --retro-text: #f5f5f5;
+            --retro-text-dim: #bdc3c7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: linear-gradient(135deg, var(--retro-bg) 0%, var(--retro-primary) 50%, var(--retro-secondary) 100%);
+            color: var(--retro-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 2rem;
+            color: var(--retro-highlight);
+            text-shadow: 0 0 10px var(--retro-highlight);
+            margin-bottom: 10px;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--retro-accent);
+            border: 2px solid var(--retro-highlight);
+            color: var(--retro-text);
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 0.6rem;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: var(--retro-highlight);
+            box-shadow: 0 0 10px var(--retro-highlight);
+        }
+
+        .game-canvas {
+            border: 3px solid var(--retro-highlight);
+            border-radius: 10px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+            cursor: crosshair;
+        }
+
+        .game-ui {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .score-panel {
+            background: var(--retro-secondary);
+            border: 2px solid var(--retro-accent);
+            border-radius: 8px;
+            padding: 15px;
+            min-width: 200px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+        }
+
+        .score-value {
+            color: var(--retro-highlight);
+        }
+
+        .controls-panel {
+            background: var(--retro-secondary);
+            border: 2px solid var(--retro-accent);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .control-button {
+            background: var(--retro-accent);
+            border: 2px solid var(--retro-highlight);
+            color: var(--retro-text);
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 0.6rem;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .control-button:hover {
+            background: var(--retro-highlight);
+            box-shadow: 0 0 10px var(--retro-highlight);
+        }
+
+        .instructions {
+            background: var(--retro-secondary);
+            border: 2px solid var(--retro-accent);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.6rem;
+            line-height: 1.4;
+        }
+
+        .power-meter {
+            width: 100%;
+            height: 20px;
+            background: var(--retro-primary);
+            border: 2px solid var(--retro-accent);
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .power-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--retro-success), var(--retro-warning), var(--retro-highlight));
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            height: 25px;
+            color: var(--retro-highlight);
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 1.5rem;
+            }
+            
+            .game-ui {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .score-panel, .controls-panel {
+                min-width: auto;
+            }
+            
+            .game-canvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-button">← BACK TO ARCADE</a>
+    
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">🏹 ARCHERY CHALLENGE</h1>
+        </header>
+
+        <canvas id="gameCanvas" class="game-canvas" width="800" height="500"></canvas>
+
+        <div class="game-ui">
+            <div class="score-panel">
+                <div class="score-item">
+                    <span>Score:</span>
+                    <span class="score-value" id="currentScore">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Arrows:</span>
+                    <span class="score-value" id="arrowsLeft">10</span>
+                </div>
+                <div class="score-item">
+                    <span>Best:</span>
+                    <span class="score-value" id="bestScore">0</span>
+                </div>
+                <div class="power-meter">
+                    <div class="power-fill" id="powerFill"></div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <button class="control-button" onclick="resetGame()">NEW GAME</button>
+                <button class="control-button" onclick="toggleInstructions()">HELP</button>
+            </div>
+        </div>
+
+        <div class="message" id="gameMessage">Click and hold to aim, release to shoot!</div>
+
+        <div class="instructions" id="instructions" style="display: none;">
+            <h3 style="color: var(--retro-highlight); margin-bottom: 10px;">🎯 HOW TO PLAY</h3>
+            <p><strong>AIM:</strong> Click and hold anywhere on screen</p>
+            <p><strong>POWER:</strong> Watch the power meter fill up</p>
+            <p><strong>SHOOT:</strong> Release to fire your arrow</p>
+            <p><strong>SCORING:</strong> Bullseye = 100pts, Gold = 80pts, Red = 60pts, Blue = 40pts, Black = 20pts</p>
+            <p><strong>GOAL:</strong> Get the highest score with 10 arrows!</p>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let isAiming = false;
+        let power = 0;
+        let powerDirection = 1;
+        let arrows = [];
+        let score = 0;
+        let arrowsLeft = 10;
+        let bestScore = localStorage.getItem('archeryBestScore') || 0;
+        let gameMessage = '';
+
+        // Game objects
+        const bow = { x: 50, y: 250, angle: 0 };
+        const target = { x: 700, y: 250, radius: 80 };
+
+        // Initialize game
+        updateDisplay();
+        gameLoop();
+
+        // Event listeners
+        canvas.addEventListener('mousedown', startAiming);
+        canvas.addEventListener('mouseup', shoot);
+        canvas.addEventListener('mousemove', updateAim);
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchend', handleTouchEnd);
+        canvas.addEventListener('touchmove', handleTouchMove);
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            startAiming(mouseEvent);
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            shoot();
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            updateAim(mouseEvent);
+        }
+
+        function startAiming(e) {
+            if (arrowsLeft <= 0) return;
+            isAiming = true;
+            power = 0;
+            updateAim(e);
+        }
+
+        function updateAim(e) {
+            if (!isAiming) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Calculate angle from bow to mouse
+            const dx = mouseX - bow.x;
+            const dy = mouseY - bow.y;
+            bow.angle = Math.atan2(dy, dx);
+        }
+
+        function shoot() {
+            if (!isAiming || arrowsLeft <= 0) return;
+            
+            isAiming = false;
+            arrowsLeft--;
+            
+            // Create arrow with power and angle
+            const arrow = {
+                x: bow.x + 30,
+                y: bow.y,
+                vx: Math.cos(bow.angle) * power * 0.3,
+                vy: Math.sin(bow.angle) * power * 0.3,
+                gravity: 0.1,
+                trail: []
+            };
+            
+            arrows.push(arrow);
+            power = 0;
+            updateDisplay();
+        }
+
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            drawBackground();
+            
+            // Draw target
+            drawTarget();
+            
+            // Draw bow
+            drawBow();
+            
+            // Update and draw arrows
+            updateArrows();
+            
+            // Draw aim line if aiming
+            if (isAiming) {
+                updatePower();
+                drawAimLine();
+            }
+            
+            // Check game over
+            if (arrowsLeft <= 0 && arrows.length === 0) {
+                if (score > bestScore) {
+                    bestScore = score;
+                    localStorage.setItem('archeryBestScore', bestScore);
+                    gameMessage = `🎉 NEW HIGH SCORE: ${score}! 🎉`;
+                } else {
+                    gameMessage = `Game Over! Final Score: ${score}`;
+                }
+                updateDisplay();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawBackground() {
+            // Sky gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#98FB98');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Ground
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+            
+            // Clouds
+            drawCloud(150, 80);
+            drawCloud(300, 60);
+            drawCloud(550, 90);
+        }
+
+        function drawCloud(x, y) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.arc(x + 25, y, 25, 0, Math.PI * 2);
+            ctx.arc(x + 50, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawTarget() {
+            const rings = [
+                { radius: 80, color: '#FFFFFF' },
+                { radius: 64, color: '#000000' },
+                { radius: 48, color: '#0066CC' },
+                { radius: 32, color: '#CC0000' },
+                { radius: 16, color: '#FFD700' },
+                { radius: 8, color: '#CC0000' }
+            ];
+            
+            rings.forEach(ring => {
+                ctx.fillStyle = ring.color;
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, ring.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        function drawBow() {
+            ctx.save();
+            ctx.translate(bow.x, bow.y);
+            ctx.rotate(bow.angle);
+            
+            // Bow
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.arc(0, 0, 25, -Math.PI/3, Math.PI/3, false);
+            ctx.stroke();
+            
+            // String
+            if (isAiming) {
+                ctx.strokeStyle = '#DDD';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-20, -15);
+                ctx.lineTo(-power * 0.5, 0);
+                ctx.lineTo(-20, 15);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        function updatePower() {
+            power += powerDirection * 2;
+            if (power >= 100) {
+                power = 100;
+                powerDirection = -1;
+            } else if (power <= 0) {
+                power = 0;
+                powerDirection = 1;
+            }
+            
+            document.getElementById('powerFill').style.width = power + '%';
+        }
+
+        function drawAimLine() {
+            ctx.strokeStyle = 'rgba(233, 69, 96, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(bow.x, bow.y);
+            ctx.lineTo(bow.x + Math.cos(bow.angle) * 200, bow.y + Math.sin(bow.angle) * 200);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function updateArrows() {
+            for (let i = arrows.length - 1; i >= 0; i--) {
+                const arrow = arrows[i];
+                
+                // Add to trail
+                arrow.trail.push({ x: arrow.x, y: arrow.y });
+                if (arrow.trail.length > 5) arrow.trail.shift();
+                
+                // Update position
+                arrow.x += arrow.vx;
+                arrow.y += arrow.vy;
+                arrow.vy += arrow.gravity;
+                
+                // Draw trail
+                ctx.strokeStyle = 'rgba(139, 69, 19, 0.3)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let j = 0; j < arrow.trail.length; j++) {
+                    const point = arrow.trail[j];
+                    if (j === 0) ctx.moveTo(point.x, point.y);
+                    else ctx.lineTo(point.x, point.y);
+                }
+                ctx.stroke();
+                
+                // Draw arrow
+                drawArrow(arrow);
+                
+                // Check collision with target
+                const dx = arrow.x - target.x;
+                const dy = arrow.y - target.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < target.radius) {
+                    const points = calculateScore(distance);
+                    score += points;
+                    gameMessage = `${getScoreMessage(points)} +${points} points!`;
+                    arrows.splice(i, 1);
+                    updateDisplay();
+                    continue;
+                }
+                
+                // Remove arrow if off screen
+                if (arrow.x > canvas.width || arrow.y > canvas.height || arrow.x < 0) {
+                    arrows.splice(i, 1);
+                    gameMessage = "Missed! Try again.";
+                }
+            }
+        }
+
+        function drawArrow(arrow) {
+            ctx.save();
+            ctx.translate(arrow.x, arrow.y);
+            ctx.rotate(Math.atan2(arrow.vy, arrow.vx));
+            
+            // Arrow shaft
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(-15, -2, 20, 4);
+            
+            // Arrow head
+            ctx.fillStyle = '#C0C0C0';
+            ctx.beginPath();
+            ctx.moveTo(5, 0);
+            ctx.lineTo(-5, -5);
+            ctx.lineTo(-5, 5);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Fletching
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(-15, -4, 5, 2);
+            ctx.fillRect(-15, 2, 5, 2);
+            
+            ctx.restore();
+        }
+
+        function calculateScore(distance) {
+            if (distance <= 8) return 100;  // Bullseye
+            if (distance <= 16) return 80;  // Gold
+            if (distance <= 32) return 60;  // Red
+            if (distance <= 48) return 40;  // Blue
+            if (distance <= 64) return 20;  // Black
+            return 0;
+        }
+
+        function getScoreMessage(points) {
+            switch(points) {
+                case 100: return "🎯 BULLSEYE!";
+                case 80: return "🥇 GOLD!";
+                case 60: return "🔴 RED!";
+                case 40: return "🔵 BLUE!";
+                case 20: return "⚫ BLACK!";
+                default: return "Miss!";
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('currentScore').textContent = score;
+            document.getElementById('arrowsLeft').textContent = arrowsLeft;
+            document.getElementById('bestScore').textContent = bestScore;
+            document.getElementById('gameMessage').textContent = gameMessage;
+        }
+
+        function resetGame() {
+            score = 0;
+            arrowsLeft = 10;
+            arrows = [];
+            power = 0;
+            isAiming = false;
+            gameMessage = "Click and hold to aim, release to shoot!";
+            updateDisplay();
+        }
+
+        function toggleInstructions() {
+            const instructions = document.getElementById('instructions');
+            instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
